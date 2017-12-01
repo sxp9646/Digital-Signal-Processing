@@ -1,0 +1,28 @@
+>> k=0:1:8;
+>> Xp=1/4*exp(-j*pi/2*k).*(sinc((1-k)/2)+sinc((1+k)/2));
+>> spec.X=[conj(fliplr(Xp(2:end))) Xp];
+>> spec.f=25*[-fliplr(k(2:end)) k];
+>> spplot(spec);
+>> print ml2_fig1c.pdf
+>> fo=25;
+>> fmax = spec.f(end);
+>> h = 1/(40*fmax);
+>> t0=0;tf=3*1/fo;
+>> t = t0:h:tf;
+>> N = length(spec.f);
+>> pos = ceil(N/2);
+>> x = zeros(size(t));
+>> if rem(pos,N)
+DC = spec.X(pos);
+x = x + DC;
+end
+>> for k = pos+1:N
+x = x + (spec.X(k)*exp( j*2*pi*spec.f(k)*t) + conj(spec.X(k))*exp(-j*2*pi*spec.f(k)*t));
+end
+>> plot(t,x);
+>> hold on
+>> plot(t,DC,'r')
+>> xlabel('t [sec]')
+>> ylabel('x(t)')
+>> grid
+>> hold off

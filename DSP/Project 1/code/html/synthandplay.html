@@ -1,0 +1,342 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>synthandplay</title><meta name="generator" content="MATLAB 9.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-10-26"><meta name="DC.source" content="synthandplay.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#3">Playback parameters</a></li><li><a href="#4">Load music file and find number of voices</a></li><li><a href="#5">Process theVoices to generate sinusoids</a></li><li><a href="#6">1. Find last pulse and total duration of piece</a></li><li><a href="#7">2. Synthesize soundtrack one voice at a time (mono version)</a></li><li><a href="#8">Playback in speaker</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> xx = synthandplay(songfile, fs, tuning)
+</pre><pre class="codeinput"><span class="comment">% Synthesize and Play a song encoded in the theVoices</span>
+<span class="comment">% given piano key number in the well-tempered tuning or</span>
+<span class="comment">% just-tempered tuning</span>
+<span class="comment">%</span>
+<span class="comment">% usage: xx = synthandplay(songfile, fs, tuning)</span>
+<span class="comment">%</span>
+<span class="comment">% xx = the output sinusoidal waveform</span>
+<span class="comment">% songfile = the name of the *.mat file to read from</span>
+<span class="comment">% fs = sampling frequecy</span>
+<span class="comment">% tuning = 1 for well-tempered tuning, 0 for just-tempered tuning</span>
+<span class="comment">%</span>
+
+<span class="comment">% Set default values</span>
+<span class="keyword">if</span> nargin == 0
+    songfile = <span class="string">'BWV847_Fugue2_Cminor'</span>; <span class="comment">% Default song</span>
+    fs = 11025; <span class="comment">% default sampling frequency</span>
+    tuning = 1;
+<span class="keyword">elseif</span> nargin == 1
+    fs = 11025; <span class="comment">% default sampling frequency</span>
+    tuning = 1;
+<span class="keyword">elseif</span> nargin == 2
+    tuning = 1;
+<span class="keyword">end</span>
+</pre><h2 id="3">Playback parameters</h2><pre class="codeinput">bpm = 80;
+beats_per_second = bpm/60;
+seconds_per_beat = 1/beats_per_second;
+seconds_per_pulse = seconds_per_beat/4;
+samples_per_pulse = fs * seconds_per_pulse;
+</pre><h2 id="4">Load music file and find number of voices</h2><pre class="codeinput">eval([<span class="string">'load'</span> <span class="string">' '''</span> songfile <span class="string">'.mat'''</span>]);
+number_of_voices = size(theVoices,2);
+</pre><h2 id="5">Process theVoices to generate sinusoids</h2><h2 id="6">1. Find last pulse and total duration of piece</h2><pre class="codeinput"><span class="keyword">for</span> vloop = 1:number_of_voices
+    <span class="comment">% find # of notes per voice</span>
+    number_of_notes(vloop) = length(theVoices(vloop).noteNumbers);
+    <span class="keyword">if</span> number_of_notes(vloop)&gt; 0
+        last_pulse(vloop) = theVoices(vloop).startPulses(number_of_notes(vloop));
+        last_duration(vloop) = theVoices(vloop).durations(number_of_notes(vloop));
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2 id="7">2. Synthesize soundtrack one voice at a time (mono version)</h2><p>Find size of vector to hold all notes</p><pre class="codeinput">size_of_soundtrack = (sum(theVoices(1).durations*samples_per_pulse*1.08)<span class="keyword">...</span>
+                          + number_of_notes(1));
+
+soundtrack = zeros(1, round(size_of_soundtrack));
+
+<span class="comment">% Synthesize the notes, one voice at a time</span>
+fprintf(<span class="string">'synthesizing %d voices\n'</span>, number_of_voices);
+dur = seconds_per_pulse;
+one_pulse_rest_note = key2notewt(0,0,dur);
+
+<span class="keyword">for</span> vloop = 1:number_of_voices <span class="comment">% voices loop</span>
+    fprintf(<span class="string">'voices %d\n'</span>, vloop);
+    n1 = 1;
+    <span class="keyword">for</span> nloop = 1:number_of_notes(vloop) <span class="comment">% notes loop</span>
+        <span class="comment">% Find duration and key number</span>
+        dur = (theVoices(vloop).durations(nloop))*seconds_per_pulse;
+        keynum = theVoices(vloop).noteNumbers(nloop);
+
+        <span class="comment">% Generate waveform, include harmonics and ADSR</span>
+        <span class="keyword">if</span> tuning == 1
+            note = key2notewt(80*exp(j*pi/4),keynum,dur);
+        <span class="keyword">elseif</span> tuning == 0
+            note = key2notejt(80*exp(j*pi/4),keynum,dur);
+        <span class="keyword">end</span>
+        enveloped_note = envelope(note);
+
+        <span class="comment">% Compute where to insert tone</span>
+        place_of_tone = theVoices(vloop).startPulses(nloop);
+        <span class="keyword">if</span> nloop == 1
+            <span class="keyword">if</span> place_of_tone ~= 1
+                delay = place_of_tone-1;
+                <span class="keyword">for</span> loop = 1:delay
+                    n2 = n1 + length(one_pulse_rest_note) - 1;
+                    soundtrack(n1:n2) = soundtrack(n1:n2) + one_pulse_rest_note;
+                    n1 = n2 + 1;
+                <span class="keyword">end</span>
+                n2 = n1 + length(enveloped_note) - 1;
+                soundtrack(n1:n2) = soundtrack(n1:n2) + enveloped_note;
+                n1 = n2 + 1;
+            <span class="keyword">else</span>
+                n2 = n1 + length(one_pulse_rest_note) - 1;
+                soundtrack(n1:n2) = soundtrack(n1:n2) + one_pulse_rest_note;
+                n1 = n2 + 1;
+            <span class="keyword">end</span>
+        <span class="keyword">else</span>
+            <span class="comment">% insert voices in soundtrack, in the right place</span>
+            pulse_difference = place_of_tone - <span class="keyword">...</span>
+                               theVoices(vloop).startPulses(nloop-1);
+
+            rest_pulses_needed = pulse_difference - <span class="keyword">...</span>
+                                 round(theVoices(vloop).durations(nloop-1));
+
+            <span class="keyword">if</span> rest_pulses_needed &gt; 0
+               <span class="keyword">for</span> loop = 1:rest_pulses_needed
+                   n2 = n1 + length(one_pulse_rest_note) - 1;
+                   soundtrack(n1:n2) = soundtrack(n1:n2) + one_pulse_rest_note;
+                   n1 = n2 + 1;
+               <span class="keyword">end</span>
+               n2 = n1 + length(enveloped_note) - 1;
+               soundtrack(n1:n2) = soundtrack(n1:n2) + enveloped_note;
+               n1 = n2 + 1;
+            <span class="keyword">end</span>
+<span class="comment">%</span>
+<span class="comment">%             if rest_pulses_needed &lt; 0</span>
+<span class="comment">%                 n1 = n1 - length(one_pulse_rest_note)*rest_pulses_needed;</span>
+<span class="comment">%                 n2 = n1 + length(enveloped_note) - 1;</span>
+<span class="comment">%                 soundtrack(n1:n2) = soundtrack(n1:n2) + enveloped_note;</span>
+<span class="comment">%                 n1 = n2 + 1 + length(one_pulse_rest_note)*rest_pulses_needed;</span>
+<span class="comment">%             end</span>
+<span class="comment">%</span>
+            <span class="keyword">if</span> rest_pulses_needed == 0
+                n2 = n1 + length(enveloped_note) - 1;
+                soundtrack(n1:n2) = soundtrack(n1:n2) + enveloped_note;
+                n1 = n2 + 1;
+            <span class="keyword">end</span>
+
+        <span class="keyword">end</span>
+
+    <span class="keyword">end</span>
+<span class="keyword">end</span> <span class="comment">% for number_of_voices</span>
+
+fprintf(<span class="string">'soundtrack done!\n'</span>)
+normal_soundtrack = soundtrack/max(abs(soundtrack));
+audiowrite(<span class="string">'soundtrack_wt.wav'</span>, normal_soundtrack, fs);
+</pre><h2 id="8">Playback in speaker</h2><pre class="codeinput">soundsc(soundtrack, fs);
+<span class="comment">% specgram(soundtrack,512,fs);</span>
+<span class="comment">% tt = (1/fs)*(1:length(soundtrack));</span>
+<span class="comment">% plot(tt,soundtrack)</span>
+<span class="comment">% xlabel('t [sec]')</span>
+<span class="comment">% ylabel('x(t)')</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2016b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function xx = synthandplay(songfile, fs, tuning)
+% Synthesize and Play a song encoded in the theVoices
+% given piano key number in the well-tempered tuning or 
+% just-tempered tuning
+%
+% usage: xx = synthandplay(songfile, fs, tuning)
+% 
+% xx = the output sinusoidal waveform
+% songfile = the name of the *.mat file to read from
+% fs = sampling frequecy
+% tuning = 1 for well-tempered tuning, 0 for just-tempered tuning
+% 
+
+% Set default values
+if nargin == 0
+    songfile = 'BWV847_Fugue2_Cminor'; % Default song
+    fs = 11025; % default sampling frequency
+    tuning = 1;
+elseif nargin == 1
+    fs = 11025; % default sampling frequency
+    tuning = 1;
+elseif nargin == 2
+    tuning = 1;
+end
+
+%% Playback parameters
+bpm = 80;
+beats_per_second = bpm/60;
+seconds_per_beat = 1/beats_per_second;
+seconds_per_pulse = seconds_per_beat/4;
+samples_per_pulse = fs * seconds_per_pulse;
+
+%% Load music file and find number of voices
+eval(['load' ' ''' songfile '.mat''']);
+number_of_voices = size(theVoices,2);
+
+%% Process theVoices to generate sinusoids
+%% 1. Find last pulse and total duration of piece
+for vloop = 1:number_of_voices
+    % find # of notes per voice
+    number_of_notes(vloop) = length(theVoices(vloop).noteNumbers);
+    if number_of_notes(vloop)> 0
+        last_pulse(vloop) = theVoices(vloop).startPulses(number_of_notes(vloop));
+        last_duration(vloop) = theVoices(vloop).durations(number_of_notes(vloop));
+    end
+end
+
+%% 2. Synthesize soundtrack one voice at a time (mono version)
+% Find size of vector to hold all notes
+size_of_soundtrack = (sum(theVoices(1).durations*samples_per_pulse*1.08)...
+                          + number_of_notes(1));
+
+soundtrack = zeros(1, round(size_of_soundtrack));
+
+% Synthesize the notes, one voice at a time
+fprintf('synthesizing %d voices\n', number_of_voices);
+dur = seconds_per_pulse;
+one_pulse_rest_note = key2notewt(0,0,dur);
+
+for vloop = 1:number_of_voices % voices loop
+    fprintf('voices %d\n', vloop);
+    n1 = 1;
+    for nloop = 1:number_of_notes(vloop) % notes loop
+        % Find duration and key number
+        dur = (theVoices(vloop).durations(nloop))*seconds_per_pulse;
+        keynum = theVoices(vloop).noteNumbers(nloop);
+        
+        % Generate waveform, include harmonics and ADSR
+        if tuning == 1 
+            note = key2notewt(80*exp(j*pi/4),keynum,dur);
+        elseif tuning == 0
+            note = key2notejt(80*exp(j*pi/4),keynum,dur); 
+        end
+        enveloped_note = envelope(note);
+        
+        % Compute where to insert tone
+        place_of_tone = theVoices(vloop).startPulses(nloop);
+        if nloop == 1
+            if place_of_tone ~= 1
+                delay = place_of_tone-1;
+                for loop = 1:delay
+                    n2 = n1 + length(one_pulse_rest_note) - 1;
+                    soundtrack(n1:n2) = soundtrack(n1:n2) + one_pulse_rest_note;
+                    n1 = n2 + 1;
+                end
+                n2 = n1 + length(enveloped_note) - 1;
+                soundtrack(n1:n2) = soundtrack(n1:n2) + enveloped_note;
+                n1 = n2 + 1;
+            else
+                n2 = n1 + length(one_pulse_rest_note) - 1;
+                soundtrack(n1:n2) = soundtrack(n1:n2) + one_pulse_rest_note;
+                n1 = n2 + 1;
+            end
+        else
+            % insert voices in soundtrack, in the right place
+            pulse_difference = place_of_tone - ...
+                               theVoices(vloop).startPulses(nloop-1);
+                           
+            rest_pulses_needed = pulse_difference - ...
+                                 round(theVoices(vloop).durations(nloop-1));
+                           
+            if rest_pulses_needed > 0
+               for loop = 1:rest_pulses_needed
+                   n2 = n1 + length(one_pulse_rest_note) - 1;
+                   soundtrack(n1:n2) = soundtrack(n1:n2) + one_pulse_rest_note;
+                   n1 = n2 + 1;     
+               end  
+               n2 = n1 + length(enveloped_note) - 1;
+               soundtrack(n1:n2) = soundtrack(n1:n2) + enveloped_note;
+               n1 = n2 + 1; 
+            end     
+%             
+%             if rest_pulses_needed < 0
+%                 n1 = n1 - length(one_pulse_rest_note)*rest_pulses_needed;
+%                 n2 = n1 + length(enveloped_note) - 1;
+%                 soundtrack(n1:n2) = soundtrack(n1:n2) + enveloped_note;
+%                 n1 = n2 + 1 + length(one_pulse_rest_note)*rest_pulses_needed;                    
+%             end
+%             
+            if rest_pulses_needed == 0
+                n2 = n1 + length(enveloped_note) - 1;
+                soundtrack(n1:n2) = soundtrack(n1:n2) + enveloped_note;
+                n1 = n2 + 1; 
+            end
+            
+        end
+       
+    end
+end % for number_of_voices
+
+fprintf('soundtrack done!\n')
+normal_soundtrack = soundtrack/max(abs(soundtrack));
+audiowrite('soundtrack_wt.wav', normal_soundtrack, fs);
+%% Playback in speaker
+soundsc(soundtrack, fs);
+% specgram(soundtrack,512,fs);
+% tt = (1/fs)*(1:length(soundtrack));
+% plot(tt,soundtrack)
+% xlabel('t [sec]')
+% ylabel('x(t)')
+
+##### SOURCE END #####
+--></body></html>

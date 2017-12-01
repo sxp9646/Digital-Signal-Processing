@@ -1,0 +1,19 @@
+fk1 = 800;
+Xk1 = 100*exp(j*-pi/3);
+fs = 11025;
+t1 = 0.5;
+[x1,tt] = syn_sin(fk1,Xk1,fs,t1,0);
+soundsc(x1)
+fk2 = 1200;
+Xk2 = 80*exp(j*pi/4);
+t2 = 0.8;
+[x2,tt] = syn_sin(fk2,Xk2,fs,t2,0);
+soundsc(x2)
+xx = [x1, zeros(1,1102), x2];
+soundsc(xx);
+tt = (1/fs)*(1:length(xx));
+plot(tt,xx);
+print MLProject1_fig4e.pdf
+plot(tt,xx);
+soundsc(xx,22050);
+diary off

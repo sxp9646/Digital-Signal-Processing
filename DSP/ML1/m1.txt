@@ -1,0 +1,180 @@
+>> z1 = 10*e^((2/3)*j*pi);
+>> z2 = -5 + j*5;
+>> h = zvect(z1);
+>> set(h,'Color','red')
+>> hold on
+>> h = zvect(z2);
+>> set(h,'Color','blue')
+>> zcoords
+>> ucplot
+>> hold off
+>> zprint(z1)
+ Z =     X    +     jY     Magnitude    Phase    Ph/pi   Ph(deg)
+          -5        8.66          10    2.094    0.667   120.00
+ 
+>> zprint(z2)
+ Z =     X    +     jY     Magnitude    Phase    Ph/pi   Ph(deg)
+          -5           5       7.071    2.356    0.750   135.00
+ 
+>> print ml1_fig1a.pdf
+>> zcat([j,-1,-2j,1]);
+>> print ml1_fig1b.pdf;
+>> h = zvect(z1+z2);
+>> set(h,'Color','red')
+>> hold on
+>> zcat([z1 z2]);
+>> set(h,'Color','red')
+>> xlabel('Real Part')
+>> ylabel('Imaginary Part')
+>> hold off
+>> print ml1_fig1c.pdf
+>> h = zvect(z1*z2);
+>> set(h,'Color','red')
+>> ylabel('Imaginary Part')
+>> xlabel('Real Part')
+>> zprint(h)
+ Z =     X    +     jY     Magnitude    Phase    Ph/pi   Ph(deg)
+      -8.129           0       8.129    3.142    1.000   180.00
+      -7.236           0       7.236    3.142    1.000   180.00
+ 
+>> print ml1_fig1d.pdf
+>> h = zvect(z2/z1);
+>> set(h,'Color','red')
+>> ylabel('Imaginary Part')
+>> xlabel('Real Part')
+>> hold off
+>> h = zvect(z2/z1);
+>> set(h,'Color','red')
+>> xlabel('Real Part')
+>> ylabel('Imaginary Part')
+>> z3 = z2/z1;
+>> h = zvect(z3);
+>> zprint(z3)
+ Z =     X    +     jY     Magnitude    Phase    Ph/pi   Ph(deg)
+       0.683       0.183      0.7071    0.262    0.083    15.00
+ 
+>> h = zvect(z3);
+>> hold on
+>> zcoords
+>> ucplot
+>> xlabel('Real Part')
+>> ylabel('Imaginary Part')
+>> zprint(z3)
+ Z =     X    +     jY     Magnitude    Phase    Ph/pi   Ph(deg)
+       0.683       0.183      0.7071    0.262    0.083    15.00
+ 
+>> print ml1_fig1e.pdf
+>> h = zvect(z1');
+>> set(h,'Color','red')
+>> xlabel('Real Part')
+>> ylabel('Imaginary Part')
+>> hold on
+>> h = zvect(z2');
+>> set(h,'Color','blue')
+>> hold off
+>> zprint(z1')
+ Z =     X    +     jY     Magnitude    Phase    Ph/pi   Ph(deg)
+          -5       -8.66          10   -2.094   -0.667  -120.00
+ 
+>> zprint(z2')
+ Z =     X    +     jY     Magnitude    Phase    Ph/pi   Ph(deg)
+          -5          -5       7.071   -2.356   -0.750  -135.00
+ 
+>> h = zvect(1/z1);
+>> set(h,'Color','red')
+>> xlabel('Real Part')
+>> ylabel('Imaginary Part')
+>> hold on
+>> h = zvect(1/z2);
+>> set(h,'Color','blue')
+>> hold off
+>> h = zvect(1/z1);
+>> set(h,'Color','red')
+>> xlabel('Real Part')
+>> ylabel('Imaginary Part')
+>> hold on
+>> h = zvect(1/z2);
+>> set(h,'Color','blue')
+>> hold off
+>> ucplot
+>> zcoords
+>> h = zvect(1/z2);
+>> h = zvect(1/z1);
+>> zprint(1/z1)
+ Z =     X    +     jY     Magnitude    Phase    Ph/pi   Ph(deg)
+       -0.05     -0.0866         0.1   -2.094   -0.667  -120.00
+ 
+>> set(h,'Color','red')
+>> xlabel('Real Part')
+>> ylabel('Imaginary Part')
+>> hold on
+>> h = zvect(1/z2);
+>> set(h,'Color','blue')
+>> zprint(1/z1)
+ Z =     X    +     jY     Magnitude    Phase    Ph/pi   Ph(deg)
+       -0.05     -0.0866         0.1   -2.094   -0.667  -120.00
+ 
+>> zprint(1/z2)
+ Z =     X    +     jY     Magnitude    Phase    Ph/pi   Ph(deg)
+        -0.1        -0.1      0.1414   -2.356   -0.750  -135.00
+ 
+>> print ml1_fig1g.pdf
+>> hold off
+>> h = zvect(z1');
+>> set(h,'Color','red')
+>> xlabel('Real Part')
+>> ylabel('Imaginary Part')
+>> hold on
+>> h = zvect(z2');
+>> set(h,'Color','blue')
+>> hold off
+>> print ml1_fig1f.pdf
+>> subplot(2,2,1);
+>> h = zvect(z1);
+>> set(h,'Color','red')
+>> xlabel('Real Part')
+>> ylabel('Imaginary Part')
+>> hold on
+>> h = zvect(z2);
+>> set(h,'Color','blue')
+>> hold off
+>> subplot(2,2,2);
+>> h = zvect(z1');
+>> set(h,'Color','red')
+>> xlabel('Real Part')
+>> ylabel('Imaginary Part')
+>> hold on
+>> h = zvect(z2');
+>> set(h,'Color','blue')
+>> hold off
+>> subplot(2,2,3);
+>> h = zvect(1/z1);
+>> set(h,'Color','red')
+>> xlabel('Real Part')
+>> ylabel('Imaginary Part')
+>> hold on
+>> h = zvect(1/z2);
+>> set(h,'Color','blue')
+>> hold off
+>> subplot(2,2,1);
+>> hold on
+>> ucplot
+>> hold off
+>> subplot(2,2,2);
+>> hold on
+>> ucplot
+>> hold off
+>> subplot(2,2,3);
+>> hold on
+>> ucplot
+>> hold off
+>> subplot(2,2,4);
+>> h = zvect(z1*z2);
+>> set(h,'Color','red')
+>> xlabel('Real Part')
+>> ylabel('Imaginary Part')
+>> hold on
+>> ucplot
+>> hold off
+>> print ml1_fig1h.pdf
+>> diary off
